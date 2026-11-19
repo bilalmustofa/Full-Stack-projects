@@ -5,7 +5,7 @@
  * Base Mount Point: `/api/auth` (configured in mainRouter)
  */
 import express from "express";
-import { registerController, loginController, logoutController } from "../controller/auth.controller.js";
+import { registerController, loginController, logoutController, passwordResetController } from "../controller/auth.controller.js";
 import { authenticateUser } from "../../../middleware/authentication.js";
 
 // Initialize an isolated Express router instance for authentication
@@ -31,6 +31,13 @@ router.post("/login", loginController);
  * @access  Private (User) (Requires authentication token) 
  */
 router.post("/logout", authenticateUser, logoutController);
+
+/**
+ * @route   POST /api/auth/passwordReset
+ * @desc    Handle user password reset request
+ * @access  Public 
+ */
+router.post("/passwordReset", passwordResetController);
 
 
 export default router;
