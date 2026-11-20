@@ -192,6 +192,15 @@ export const passwordResetController = async (req, res, next) => {
             });
         }
 
+        // 2. Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide a valid email address."
+            });
+        }
+
         // Enforce password complexity (minimum 8 characters)
         if(newPassword.length < 8) {
             return res.status(400).json({
