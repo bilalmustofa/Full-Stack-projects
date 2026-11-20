@@ -6,7 +6,7 @@
  * delegates business logic to authentication services, and returns formatted HTTP responses.
  */
 import { verifyToken } from "../../../utils/jwt.js";
-import { registerService, loginService } from "../service/auth.service.js";
+import { registerService, loginService, resetPasswordService } from "../service/auth.service.js";
 
 /**
  * Controller to handle new user registration.
@@ -165,6 +165,59 @@ export const logoutController = async (req, res, next) => {
         return res.status(500).json({
             success: false,
             message: "Internal server error"
+        });
+    }
+};
+
+/**
+ * Controller to handle user password reset requests.
+ * 
+ * Validates request payload, verifies email formatting, enforces password security
+ * requirements, and delegates password hashing and updates to the service layer.
+ *
+ * @param {import('express').Request} req - Express request object containing `{ email, newPassword }` in `req.body`
+ * @param {import('express').Response} res - Express response object
+ * @param {import('express').NextFunction} [next] - Express next middleware function
+ * @returns {Promise<import('express').Response>}
+ */
+export const passwordResetController = async (req, res, next) => {
+    try {
+        const { email, newPassword } = req.body || {};
+
+        //  Validate required fields
+        if (!newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "New password are required."
+            });
+        }
+
+        // Enforce password complexity (minimum 8 characters)
+        if(newPassword.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "New password must be at least 8 characters long."
+            });
+        }
+        // Delegate password reset and hashing to the service layer
+        await resetPasswordService({
+            email: email.trim().toLowerCase(),
+            newPassword
+        });
+
+        // Return success response
+        return res.status(200).json({
+            success: true,
+            message: "Password has been reset successfully."
+        });
+
+    } catch (error) {
+        console.error("Password reset controller error:", error);
+
+        // Return specific status code if thrown by service (e.g. 404 Not Found), otherwise 500
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message || "Internal server error"
         });
     }
 };
