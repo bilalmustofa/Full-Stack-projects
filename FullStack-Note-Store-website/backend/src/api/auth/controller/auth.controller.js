@@ -185,10 +185,10 @@ export const passwordResetController = async (req, res, next) => {
         const { email, newPassword } = req.body || {};
 
         //  Validate required fields
-        if (!newPassword) {
+        if (!newPassword  || !email || typeof email !== "string" || typeof newPassword !== "string") {
             return res.status(400).json({
                 success: false,
-                message: "New password are required."
+                message: "Email and new password are required and must be string."
             });
         }
 
