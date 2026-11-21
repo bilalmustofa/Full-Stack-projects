@@ -98,3 +98,37 @@ export const loginService = async ({ email, password }) => {
     };
 };
 
+/**
+ * Resets a user's password in the database.
+ *
+ * @param {object} params
+ * @param {string} params.email - User email address
+ * @param {string} params.newPassword - Raw new password to hash and store
+ * @returns {Promise<boolean>} Resolves to true when the password update succeeds
+ */
+export const resetPasswordService = async ({ email, newPassword }) => {
+    // Verify user exists in the database
+    const rows = await safeExecute(
+        "SELECT id FROM users WHERE email = ? LIMIT 1",
+        [email]
+    );
+
+    if (!rows || rows.length === 0) {
+        const error = new Error("No user found with this email address.");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    // Hash the new plaintext password with bcrypt
+    const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+    // 3. Update the password hash for the specified user
+    await safeExecute(
+        "UPDATE users SET password = ? WHERE email = ?",
+        [hashedPassword, email]
+    );
+
+    return true;
+};
+
+
