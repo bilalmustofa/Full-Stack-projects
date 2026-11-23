@@ -7,7 +7,7 @@
 import express from "express";
 import { authenticateUser } from "../../../middleware/authentication.js"; 
 import { requireAdmin } from "../../../middleware/adminMiddleware.js";
-import { getAllUsersController } from "../controller/users.controller.js";
+import { getAllUsersController, deleteUserController } from "../controller/users.controller.js";
 
 // Initialize an isolated Express router instance for user-related endpoints
 export const usersRoutes = express.Router();
@@ -18,6 +18,13 @@ export const usersRoutes = express.Router();
  * @access  Private (Admin only)
  */
 usersRoutes.get("/admin/user", authenticateUser, requireAdmin, getAllUsersController);
+
+/**
+ * @route   DELETE /api/users/admin/user/:userId
+ * @desc    Permanently delete a specific user account by ID
+ * @access  Private (Admin only)
+ */
+usersRoutes.delete("/admin/user/:userId", authenticateUser, requireAdmin, deleteUserController);
 
 
 export default usersRoutes;
