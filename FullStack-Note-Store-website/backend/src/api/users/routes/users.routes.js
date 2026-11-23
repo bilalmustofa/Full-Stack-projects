@@ -13,7 +13,7 @@ import { getAllUsersController } from "../controller/users.controller.js";
 export const usersRoutes = express.Router();
 
 /**
- * @route   GET /api/user/admin/users
+ * @route   GET /api/users/admin/user
  * @desc    Retrieve a list of all registered users
  * @access  Private (Admin only)
  */
