@@ -23,3 +23,21 @@ export const getAllUsersService = async () => {
 
     return res;
 };
+
+/**
+ * Permanently deletes a user from the database by ID.
+ * 
+ * Cascades deletion to associated records (e.g., user notes) defined by foreign key constraints.
+ *
+ * @param {string} userId - The unique UUID identifier of the user to delete
+ * @returns {Promise<boolean>} Resolves to `true` if a record was deleted, or `false` if user did not exist
+ */
+export const deleteUserService = async (userId) => {
+    const sql = "DELETE FROM users WHERE id = ?";
+    
+    // Pass query parameters as an array to prevent syntax/binding errors
+    const result = await safeExecute(sql, [userId]);
+
+    // Return true if at least one row was affected, indicating successful deletion
+    return result.affectedRows > 0;
+};
