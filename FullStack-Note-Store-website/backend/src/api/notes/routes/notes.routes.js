@@ -7,7 +7,7 @@
 import express from "express";
 import { authenticateUser } from "../../../middleware/authentication.js";
 import { requireAdmin } from "../../../middleware/adminMiddleware.js";
-import { createNotesController } from "../controller/notes.controller.js";
+import { createNotesController, readAllNotesController } from "../controller/notes.controller.js";
 
 // Initialize an isolated Express router instance for note endpoints
 export const noteRoutes = express.Router();
@@ -18,6 +18,13 @@ export const noteRoutes = express.Router();
  * @access  Private (Authenticated users)
  */
 noteRoutes.post("/createNotes", authenticateUser, createNotesController);
+
+/**
+ * @route   GET /api/notes/admin/readAllNotes
+ * @desc    Retrieve all notes across all users (administrative access only)
+ * @access  Private (Admin only)
+ */
+noteRoutes.get("/admin/readAllNotes", authenticateUser, requireAdmin, readAllNotesController);
 
 
 export default noteRoutes;
