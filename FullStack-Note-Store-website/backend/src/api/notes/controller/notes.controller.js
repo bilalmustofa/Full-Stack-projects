@@ -4,7 +4,7 @@
  * Handles incoming HTTP requests for personal notes management (CRUD),
  * validates request payloads, and delegates operations to notes services.
  */
-import { createNoteService } from "../service/notes.service.js";
+import { createNoteService, readAllNotesService } from "../service/notes.service.js";
 
 /**
  * Controller to create a new note for the authenticated user.
@@ -48,6 +48,40 @@ export const createNotesController = async (req, res, next) => {
 
     } catch (error) {
         console.error("createNotesController error:", error);
+
+        return res.status(error.statusCode || 500).json({ 
+            success: false,
+            message: error.message || "Internal server error"
+        });
+    }
+};
+
+/**
+ * Controller to retrieve all notes across all users (Administrative access only).
+ * 
+ * Invokes the notes service layer to fetch all stored notes,
+ * and returns the dataset alongside a total item count.
+ *
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @param {import('express').NextFunction} [next] - Express next middleware function
+ * @returns {Promise<import('express').Response>}
+ */
+export const readAllNotesController = async (req, res, next) => {
+    try {
+        // Fetch all note records from the service layer
+        const notes = await readAllNotesService();
+
+        // Return successful response including data payload and count
+        return res.status(200).json({
+            success: true,
+            message: "Notes fetched successfully.",
+            count: notes ? notes.length : 0,
+            data: notes || []
+        });
+
+    } catch (error) {
+        console.error("readAllNotesController error:", error);
 
         return res.status(error.statusCode || 500).json({ 
             success: false,
