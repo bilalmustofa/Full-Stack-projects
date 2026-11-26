@@ -34,3 +34,33 @@ export const createNoteService = async ({ title, content, user_id }) => {
 
     return createdNote;
 };
+
+/**
+ * Retrieves all notes across all users from the database (Administrative lookup).
+ * 
+ * Joins the users table to include author details (email) alongside note content,
+ * ordered chronologically with the most recently created notes first.
+ *
+ * @returns {Promise<Array<object>>} List of all note records with author email
+ */
+export const readAllNotesService = async () => {
+    // Select notes with author details, ordered newest first
+    const sql = `
+        SELECT 
+            notes.id,
+            notes.title,
+            notes.content,
+            notes.user_id,
+            users.email AS author_email,
+            notes.created_at,
+            notes.updated_at
+        FROM notes
+        LEFT JOIN users ON notes.user_id = users.id
+        ORDER BY notes.created_at DESC
+    `;
+
+    // Retrieve all notes with author details
+    const result = await safeExecute(sql);
+
+    return result || [];
+};
